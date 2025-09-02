@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.build/
+.venv/
+venv/
+.env
+.mypy_cache/
+.pytest_cache/
+.cache/
+
+# Artifacts
+artifacts/
+checkpoints/
+runs/
+*.pt
+*.onnx
+
+# Data
+/data/
+*.npy
+*.npz
+
+# Editors/OS
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
+
+# Node
+node_modules/

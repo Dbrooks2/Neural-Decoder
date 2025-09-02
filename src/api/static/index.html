@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Neural Signal Decoder Demo</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+      header { padding: 16px 20px; background: #111827; border-bottom: 1px solid #1f2937; }
+      main { display: grid; grid-template-columns: 360px 1fr; gap: 16px; padding: 16px; }
+      .panel { background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 12px; }
+      canvas { background: #0b1020; border: 1px solid #1f2937; border-radius: 8px; }
+      label { display:block; margin-top: 8px; }
+      input[type=number] { width: 120px; }
+      .stat { margin-top: 8px; font-size: 14px; color: #94a3b8; }
+      .row { display:flex; gap:8px; align-items:center; }
+      button { background: #2563eb; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+      button:disabled { opacity: .6; cursor:not-allowed; }
+      a { color: #93c5fd; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Neural Signal Decoder (Research Demo)</strong>  CNN+LSTM  FastAPI  WebSocket
+    </header>
+    <main>
+      <section class="panel">
+        <h3>Controls</h3>
+        <div class="row">
+          <label>Channels <input id="channels" type="number" min="1" max="256" value="32" /></label>
+          <label>Window <input id="window" type="number" min="8" max="512" value="64" /></label>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <button id="start">Start Demo</button>
+          <button id="stop" disabled>Stop</button>
+        </div>
+        <div class="stat" id="latency">Latency:  ms</div>
+        <div class="stat" id="status">Disconnected</div>
+        <p class="stat">Tip: Train a model first for better motion. Otherwise the random init still streams.</p>
+      </section>
+      <section class="panel">
+        <canvas id="canvas" width="640" height="400"></canvas>
+      </section>
+    </main>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const startBtn = document.getElementById('start');
+      const stopBtn = document.getElementById('stop');
+      const latencyEl = document.getElementById('latency');
+      const statusEl = document.getElementById('status');
+      const channelsEl = document.getElementById('channels');
+      const windowEl = document.getElementById('window');
+
+      let ws = null;
+      let raf = null;
+      let running = false;
+      let x = canvas.width / 2;
+      let y = canvas.height / 2;
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#1f2937';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#60a5fa';
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI*2);
+        ctx.fill();
+        raf = requestAnimationFrame(draw);
+      }
+
+      function randomSignal(C, W) {
+        const arr = new Array(C);
+        for (let c = 0; c < C; c++) {
+          arr[c] = new Array(W);
+          let v = 0;
+          for (let t = 0; t < W; t++) {
+            v = 0.9 * v + 0.1 * (Math.random() * 2 - 1);
+            arr[c][t] = v + 0.2 * (Math.random() * 2 - 1);
+          }
+        }
+        return arr;
+      }
+
+      function connect() {
+        const C = parseInt(channelsEl.value, 10);
+        const W = parseInt(windowEl.value, 10);
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        ws = new WebSocket(`${proto}://${location.host}/ws`);
+        ws.onopen = () => { statusEl.textContent = 'Connected'; running = true; loop(); draw(); };
+        ws.onclose = () => { statusEl.textContent = 'Disconnected'; running = false; cancelAnimationFrame(raf); };
+        ws.onerror = () => { statusEl.textContent = 'Error'; };
+        ws.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.latency_ms != null) latencyEl.textContent = `Latency: ${msg.latency_ms.toFixed(1)} ms`;
+            if (typeof msg.dx === 'number' && typeof msg.dy === 'number') {
+              x = Math.max(0, Math.min(canvas.width, x + msg.dx * 5));
+              y = Math.max(0, Math.min(canvas.height, y + msg.dy * 5));
+            }
+          } catch {}
+        };
+        function loop() {
+          if (!running) return;
+          const payload = { signal: randomSignal(C, W) };
+          ws.send(JSON.stringify(payload));
+          setTimeout(loop, 33); // ~30Hz
+        }
+      }
+
+      startBtn.onclick = () => { startBtn.disabled = true; stopBtn.disabled = false; connect(); };
+      stopBtn.onclick = () => { startBtn.disabled = false; stopBtn.disabled = true; running = false; ws && ws.close(); };
+    </script>
+  </body>
+</html>
