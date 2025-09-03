@@ -1,0 +1,74 @@
+{
+  "EEGNet": {
+    "baseline": {
+      "params": 5476,
+      "latency_ms": 0.35792899812804535,
+      "accuracy": 28.125
+    },
+    "pruned": {
+      "50": {
+        "params": 5476,
+        "latency_ms": 0.32335299969417974,
+        "accuracy": 28.125
+      },
+      "90": {
+        "params": 5476,
+        "latency_ms": 0.35354899999219924,
+        "accuracy": 25.0
+      }
+    },
+    "quantized": {
+      "params": 3424,
+      "latency_ms": 0.422937999246642,
+      "accuracy": 25.0
+    }
+  },
+  "MobileEEGNet": {
+    "baseline": {
+      "params": 700,
+      "latency_ms": 0.19116400013444945,
+      "accuracy": 34.375
+    },
+    "pruned": {
+      "50": {
+        "params": 700,
+        "latency_ms": 0.17881199979456142,
+        "accuracy": 25.0
+      },
+      "90": {
+        "params": 700,
+        "latency_ms": 0.1756299997214228,
+        "accuracy": 25.0
+      }
+    },
+    "quantized": {
+      "params": 632,
+      "latency_ms": 0.2406290013459511,
+      "accuracy": 25.0
+    }
+  },
+  "TinyEEGNet": {
+    "baseline": {
+      "params": 3932,
+      "latency_ms": 0.06946499925106764,
+      "accuracy": 28.125
+    },
+    "pruned": {
+      "50": {
+        "params": 3932,
+        "latency_ms": 0.042341000225860626,
+        "accuracy": 31.25
+      },
+      "90": {
+        "params": 3932,
+        "latency_ms": 0.04857899941271171,
+        "accuracy": 28.125
+      }
+    },
+    "quantized": {
+      "params": 3864,
+      "latency_ms": 0.06790999992517754,
+      "accuracy": 25.0
+    }
+  }
+}

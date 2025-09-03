@@ -1,0 +1,11 @@
+{
+  "signal_type": "eeg",
+  "num_channels": 32,
+  "sampling_rate": 1000,
+  "num_classes": 4,
+  "train_samples": 800,
+  "val_samples": 200,
+  "test_samples": 200,
+  "trial_length_seconds": 2.0,
+  "trial_length_samples": 2000
+}

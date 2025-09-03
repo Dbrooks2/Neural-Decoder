@@ -1,0 +1,23 @@
+{
+  "EEGNet": {
+    "params": 7524,
+    "size_mb": 0.0287017822265625,
+    "latency_ms_mean": 0.6328299985034391,
+    "latency_ms_p95": 0.7559599995147435,
+    "accuracy_percent": 34.99999940395355
+  },
+  "MobileEEGNet": {
+    "params": 700,
+    "size_mb": 0.0026702880859375,
+    "latency_ms_mean": 0.2184800014947541,
+    "latency_ms_p95": 0.3785199907724745,
+    "accuracy_percent": 12.5
+  },
+  "TinyEEGNet": {
+    "params": 3932,
+    "size_mb": 0.0149993896484375,
+    "latency_ms_mean": 0.1127199994516559,
+    "latency_ms_p95": 0.17863501998363063,
+    "accuracy_percent": 50.0
+  }
+}
